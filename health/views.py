@@ -15,8 +15,6 @@ def upload_csv(request):
         if not csv_file.name.endswith('.csv'):
             return HttpResponse("Não é um arquivo CSV.", status=400)
 
-        if csv_file.multiple_chunks():
-            return HttpResponse("O arquivo é muito grande.", status=400)
 
         # Processar o arquivo CSV
         csv_data = csv.reader(csv_file.read().decode('utf-8').splitlines())
@@ -29,5 +27,4 @@ def upload_csv(request):
         return HttpResponse("Arquivo CSV enviado e processado com sucesso!")
     else:
         form = UploadForm()
-    # Atualize o caminho do template aqui:
     return render(request, 'health/upload.html', {'form': form})
