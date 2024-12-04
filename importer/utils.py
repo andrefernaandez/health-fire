@@ -3,9 +3,10 @@ import pandas as pd
 # Constantes com os nomes das colunas
 UNIDADE_FEDERACAO = "Unidade da Federação"
 MESES = [
-    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", 
+    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
     "Jul", "Ago", "Set", "Out", "Nov", "Dez"
 ]
+
 
 def process_health_file(file_path):
     try:
@@ -18,7 +19,6 @@ def process_health_file(file_path):
         ano = periodo_info.split(":")[1].strip().split(";")[0]
         print(f"Ano detectado: {ano}")
 
-
         try:
             data = pd.read_csv(file_path, skiprows=4, encoding='utf-8', delimiter=';')
         except UnicodeDecodeError:
@@ -29,15 +29,15 @@ def process_health_file(file_path):
 
         # Verifica se a primeira coluna contém 'Unidade da Federação'
         if data.columns[0].strip() != UNIDADE_FEDERACAO:
-            raise ValueError(f"A primeira coluna não contém '{UNIDADE_FEDERACAO}'. O nome encontrado foi '{data.columns[0]}'.")
+            raise ValueError(
+                f"A primeira coluna não contém '{UNIDADE_FEDERACAO}'. O nome encontrado foi '{data.columns[0]}'.")
 
         # Detecta dinamicamente as colunas de meses
         columns = data.columns
         year_columns = [
-         col for col in columns 
-        if col.startswith(f"{ano}/") and any(mes in col for mes in MESES)
-]
-
+            col for col in columns
+            if col.startswith(f"{ano}/") and any(mes in col for mes in MESES)
+        ]
 
         # Log para verificar as colunas filtradas
         print(f"Colunas filtradas para {ano}: {year_columns}")
@@ -72,3 +72,7 @@ def process_health_file(file_path):
 
     except Exception as e:
         raise ValueError(f"Erro ao processar o arquivo: {e}")
+
+
+def imprimir_linha_do_arquivo(line):
+    print(f"Linha do arquivo: {line}")
