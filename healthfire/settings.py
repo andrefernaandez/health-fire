@@ -78,10 +78,15 @@ WSGI_APPLICATION = 'healthfire.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'healthfire_db',
+        'USER': 'healthfire_user',
+        'PASSWORD': '2685',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
 
 
 # Password validation
