@@ -7,7 +7,7 @@ class Symptoms(models.Model):
     type_health = models.ForeignKey(TypeContent, on_delete=models.CASCADE)
     cid = models.ForeignKey(CID, on_delete=models.CASCADE)
     federative_unit = models.CharField(max_length=100)
-    month_year = models.DateField()
+    month_year = models.CharField(max_length=20)
     value = models.CharField(max_length=100)
     file = models.ForeignKey(ImportFile, on_delete=models.CASCADE)
 

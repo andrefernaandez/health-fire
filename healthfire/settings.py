@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'health', 
     'symptoms',
     'importer',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,3 @@
+__pycache__/
+dump.rdb
+venv/ # Adiciona também a pasta do ambiente virtual
