@@ -30,7 +30,7 @@ def register_health_and_symptoms(import_file_id):
                     type_health=type_health,
                     cid=cid,
                     federative_unit=federative_unit,
-                    month_year=line["data"],  # Usando a data completa (mês e ano)
+                    month_year=line["data"],  # Usando a data completa
                     value=line["valor"],
                     file=import_file,
                 )
