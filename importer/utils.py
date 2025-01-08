@@ -65,7 +65,7 @@ def process_health_file(file_path):
                 # Adiciona o valor limpo no dicionário
                 data_dicts.append({
                     "unidade_federacao": federative_unit,
-                    "data": datetime(year=int(ano), month=mes_num, day=1),  # Primeiro dia de cada mês
+                    "data": datetime(year=int(ano), month=mes_num, day=1).date,  # Primeiro dia de cada mês
                     "valor": value  # Armazena o valor da coluna também
                 })
 

@@ -2,13 +2,15 @@ from django.db import models
 
 
 class ImportFile(models.Model):
+    TYPE_HEALTH="health"
+    TYPE_FIRE="fire"
     FILE_TYPE_CHOICES = [
-        ('health', 'Saúde'),
-        ('fire', 'Queimadas'),
+        (TYPE_HEALTH, 'Saúde'),
+        (TYPE_FIRE, 'Queimadas'),
     ]
     STATUS_OPEN = 1
     STATUS_PROGRESS = 2
-    STATUS_FINALLY = 1
+    STATUS_FINALLY = 3
     FILE_STATUS_CHOICES = [
         (STATUS_OPEN, 'Aberto'),
         (STATUS_PROGRESS, 'Iniciado'),

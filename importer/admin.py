@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import ImportFile
-from .tasks import process_file
+from .tasks import process_file_health
 
 @admin.register(ImportFile)
 class ImportFileAdmin(admin.ModelAdmin):

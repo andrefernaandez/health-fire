@@ -142,5 +142,8 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
 #resultados do Celery usando Redis
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0' 
+
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS=2000
 

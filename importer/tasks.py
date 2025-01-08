@@ -6,7 +6,7 @@ from importer.models import ImportFile
 from django.utils import timezone
 
 @shared_task
-def process_file(import_file_id):
+def process_file_health(import_file_id):
     try:
         # Recupera o objeto ImportFile pelo ID
         import_file = ImportFile.objects.get(id=import_file_id)
@@ -36,11 +36,20 @@ def process_file(import_file_id):
                     continue  # Ignorar linha se o valor estiver ausente
 
                 # Criar instância de Symptoms no banco
-                Symptoms.objects.create(
+                symtom=Symptoms.objects.filter(
                     type_health=type_health,
                     cid=cid,
                     federative_unit=federative_unit,
-                    month_year=line["data"],  # Usando a data completa (mês e ano)
+                    month_year__month=line["data"].month,
+                      month_year__year=line["data"].year,  # Usando a data completa
+                    value=line["valor"],
+                ).first()
+                if not symtom:
+                    Symptoms.objects.create(
+                    type_health=type_health,
+                    cid=cid,
+                    federative_unit=federative_unit,
+                    month_year=line["data"],  # Usando a data completa
                     value=line["valor"],
                     file=import_file,
                 )
