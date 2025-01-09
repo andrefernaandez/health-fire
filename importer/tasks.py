@@ -1,5 +1,5 @@
 from celery import shared_task
-from importer.utils import process_health_file
+from importer.utils import process_health_file  # Mantém o processamento do CSV no utils.py
 from health.models import TypeContent, CID
 from symptoms.models import Symptoms
 from importer.models import ImportFile
@@ -11,14 +11,16 @@ def process_file_health(import_file_id):
         # Recupera o objeto ImportFile pelo ID
         import_file = ImportFile.objects.get(id=import_file_id)
 
+        # Atualiza o status do arquivo para 'em progresso'
         import_file.status = ImportFile.STATUS_PROGRESS
         import_file.start_at = timezone.now()
         import_file.save()
 
-        # Processa o arquivo CSV associado
+        # Processa o arquivo CSV associado utilizando a função de utils
         file_path = import_file.file.path
         processed_data = process_health_file(file_path)
 
+        # Extrai as informações do header e os dados processados
         header_info = processed_data["header_info"]
         data_list = processed_data["data"]
 
@@ -35,29 +37,32 @@ def process_file_health(import_file_id):
                     print(f"Linha ignorada: 'Unidade da Federação' ausente. Dados: {line}")
                     continue  # Ignorar linha se o valor estiver ausente
 
-                # Criar instância de Symptoms no banco
-                symtom=Symptoms.objects.filter(
+                # Verifica se já existe um objeto Symptoms com os mesmos dados
+                symtom = Symptoms.objects.filter(
                     type_health=type_health,
                     cid=cid,
                     federative_unit=federative_unit,
                     month_year__month=line["data"].month,
-                      month_year__year=line["data"].year,  # Usando a data completa
+                    month_year__year=line["data"].year,  # Usando a data completa
                     value=line["valor"],
                 ).first()
+
                 if not symtom:
+                    # Cria uma nova instância de Symptoms no banco de dados
                     Symptoms.objects.create(
-                    type_health=type_health,
-                    cid=cid,
-                    federative_unit=federative_unit,
-                    month_year=line["data"],  # Usando a data completa
-                    value=line["valor"],
-                    file=import_file,
-                )
+                        type_health=type_health,
+                        cid=cid,
+                        federative_unit=federative_unit,
+                        month_year=line["data"],  # Usando a data completa
+                        value=line["valor"],
+                        file=import_file,
+                    )
 
             except Exception as e:
                 print(f"Erro ao processar a linha: {e}. Dados: {line}")
                 continue  # Continua processando as próximas linhas
 
+        # Atualiza o status para 'finalizado' após o processamento completo
         import_file.status = ImportFile.STATUS_FINALLY
         import_file.end_at = timezone.now()
         import_file.save()
@@ -68,7 +73,7 @@ def process_file_health(import_file_id):
         raise Exception(f"ImportFile com ID {import_file_id} não encontrado.")
     except Exception as e:
         if 'import_file' in locals():
-            # Atualiza o status para "aberto" em caso de falha
+            # Atualiza o status para 'aberto' em caso de falha
             import_file.status = ImportFile.STATUS_OPEN
             import_file.save()
         raise Exception(f"Erro ao processar o arquivo: {e}")

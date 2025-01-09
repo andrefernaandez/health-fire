@@ -29,6 +29,9 @@ def process_health_file(file_path):
         # Verifica as colunas detectadas no arquivo
         print("Colunas detectadas no CSV:", data.columns.tolist())
 
+        # Remove a última linha (total) do DataFrame
+        data = data.drop(data.index[-1])
+
         # considera que a linha 5 (índice 4) contém as unidades da federação
         unidade_federacao_col = data.columns[0]  # Primeira coluna com os dados das UFs
         if unidade_federacao_col.strip() != "Unidade da Federação":
@@ -51,7 +54,6 @@ def process_health_file(file_path):
         if len(year_columns) < 12:
             raise ValueError("O arquivo não contém colunas suficientes para os meses do ano.")
 
-
         data_dicts = []
         for _, row in filtered_data.iterrows():
             for col in year_columns:
@@ -63,9 +65,14 @@ def process_health_file(file_path):
                 value = str(row[col]).replace(";", "").strip()
 
                 # Adiciona o valor limpo no dicionário
+                try:
+                    date_obj = datetime(year=int(ano), month=mes_num, day=1).date()
+                except ValueError:
+                    raise ValueError(f"Erro ao criar a data para {ano}-{mes_num}-01.")
+
                 data_dicts.append({
                     "unidade_federacao": federative_unit,
-                    "data": datetime(year=int(ano), month=mes_num, day=1).date,  # Primeiro dia de cada mês
+                    "data": date_obj,  # Primeiro dia de cada mês
                     "valor": value  # Armazena o valor da coluna também
                 })
 
