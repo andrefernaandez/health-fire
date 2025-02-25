@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .chart-container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Relatórios</h1>
+
+    <div class="chart-container">
+        <h2>Evolução Temporal das Queimadas</h2>
+        <canvas id="evolucaoChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Distribuição Geográfica das Queimadas</h2>
+        <canvas id="distribuicaoChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Correlação entre Queimadas e Saúde</h2>
+        <canvas id="correlacaoChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Impacto do Clima nas Queimadas</h2>
+        <canvas id="impactoChart"></canvas>
+    </div>
+
+    <script>
+        async function fetchData(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Erro ao carregar ${url}: ${response.statusText}`);
+                return await response.json();
+            } catch (error) {
+                console.error(error);
+                return null;
+            }
+        }
+
+        async function renderCharts() {
+            // Evolução Temporal das Queimadas
+            const evolucaoData = await fetchData("/dashboard/evolucao-temporal/");
+            if (evolucaoData && evolucaoData.queimadas.length > 0) {
+                new Chart(document.getElementById("evolucaoChart"), {
+                    type: "line",
+                    data: {
+                        labels: evolucaoData.queimadas.map(item => `${item.year}-${item.month}`),
+                        datasets: [{
+                            label: "Número de queimadas",
+                            data: evolucaoData.queimadas.map(item => item.total),
+                            borderColor: "red",
+                            backgroundColor: "rgba(255, 0, 0, 0.2)",
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: { scales: { y: { beginAtZero: true } } }
+                });
+            } else {
+                console.warn("Dados de evolução temporal não disponíveis.");
+            }
+
+            // Distribuição Geográfica das Queimadas 
+            const distribuicaoData = await fetchData("/dashboard/distribuicao-geografica/");
+            if (distribuicaoData && distribuicaoData.queimadas.length > 0) {
+                new Chart(document.getElementById("distribuicaoChart"), {
+                    type: "bar",
+                    data: {
+                        labels: distribuicaoData.queimadas.map(item => item.city__name),
+                        datasets: [{
+                            label: "Número de queimadas por cidade",
+                            data: distribuicaoData.queimadas.map(item => item.total_queimadas),
+                            backgroundColor: "darkorange"
+                        }]
+                    },
+                    options: { scales: { y: { beginAtZero: true } } }
+                });
+            } else {
+                console.warn("Dados de distribuição geográfica não disponíveis.");
+            }
+
+            // Correlação entre Queimadas e Saúde (ajuste para comparar total_queimadas e total_casos)
+            const correlacaoData = await fetchData("/dashboard/correlacao-queimadas-saude/");
+            if (correlacaoData && correlacaoData.queimadas.length > 0 && correlacaoData.saude.length > 0) {
+                new Chart(document.getElementById("correlacaoChart"), {
+                    type: "scatter",
+                    data: {
+                        datasets: [{
+                            label: "Queimadas vs Casos de Doenças Respiratórias",
+                            data: correlacaoData.queimadas.map((item, index) => ({
+                                x: item.total_queimadas,
+                                y: correlacaoData.saude[index].total_casos
+                            })),
+                            backgroundColor: "blue"
+                        }]
+                    },
+                    options: { 
+                        scales: { 
+                            x: { beginAtZero: true, title: { display: true, text: "Total de Queimadas" } }, 
+                            y: { beginAtZero: true, title: { display: true, text: "Total de Casos de Doenças Respiratórias" } } 
+                        } 
+                    }
+                });
+            } else {
+                console.warn("Dados de correlação não disponíveis.");
+            }
+
+            // Impacto do Clima nas Queimadas
+            const impactoData = await fetchData("/dashboard/impacto-clima-queimadas/");
+            if (impactoData && impactoData.impacto.length > 0) {
+                new Chart(document.getElementById("impactoChart"), {
+                    type: "line",
+                    data: {
+                        labels: impactoData.impacto.map(item => `Dias sem chuva: ${item.no_rain_days}`),
+                        datasets: [{
+                            label: "Queimadas x Clima",
+                            data: impactoData.impacto.map(item => item.total_queimadas),
+                            borderColor: "green",
+                            backgroundColor: "rgba(0, 128, 0, 0.2)",
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: { scales: { y: { beginAtZero: true } } }
+                });
+            } else {
+                console.warn("Dados de impacto do clima não disponíveis.");
+            }
+        }
+
+        renderCharts();
+    </script>
+</body>
+</html>

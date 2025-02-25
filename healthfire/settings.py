@@ -41,6 +41,10 @@ INSTALLED_APPS = [
     'symptoms',
     'importer',
     'django_extensions',
+    'burned',
+    'geodata', 
+    'rest_framework',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
@@ -85,6 +89,7 @@ DATABASES = {
         'PASSWORD': '2685',
         'HOST': 'localhost',
         'PORT': '5432',
+        'connect_timeout': 300,
     }
 }
 
@@ -118,7 +123,7 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -145,5 +150,10 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0' 
 
 
-DATA_UPLOAD_MAX_NUMBER_FIELDS=2000
+DATA_UPLOAD_MAX_NUMBER_FIELDS=500000
+
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800
+
 

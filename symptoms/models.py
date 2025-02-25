@@ -1,6 +1,5 @@
 from django.db import models
 from health.models import TypeContent, CID
-from importer.models import ImportFile
 
 
 class Symptoms(models.Model):
@@ -9,7 +8,7 @@ class Symptoms(models.Model):
     federative_unit = models.CharField(max_length=100)
     month_year = models.DateField()
     value = models.CharField(max_length=100)
-    file = models.ForeignKey(ImportFile, on_delete=models.CASCADE)
+    file = models.ForeignKey('importer.ImportFile', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.type_health.name} - {self.cid.name} ({self.month_year})"
