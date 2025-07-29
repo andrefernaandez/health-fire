@@ -38,11 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'health', 
-    'symptoms',
+    'disease_cases',
     'importer',
     'django_extensions',
     'burned',
-    'geodata', 
+    'geo_data', 
     'rest_framework',
     'dashboard',
 ]

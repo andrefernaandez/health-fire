@@ -12,5 +12,5 @@ class ImportFileAdmin(admin.ModelAdmin):
         # Verifica o tipo do arquivo e chama a tarefa correspondente
         if obj.type == ImportFile.TYPE_HEALTH:
             process_file_health.delay(obj.id)
-        elif obj.type == ImportFile.TYPE_FIRE:
+        elif obj.type == ImportFile.TYPE_BURNED:
             process_file_burned.delay(obj.id)

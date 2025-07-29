@@ -18,5 +18,5 @@ def process_file_when_created(sender, instance, created, **kwargs):
 
         if instance.type == ImportFile.TYPE_HEALTH:
             process_file_health(instance.id)
-        elif instance.type == ImportFile.TYPE_FIRE:
+        elif instance.type == ImportFile.TYPE_BURNED:
             process_file_burned(instance.id)

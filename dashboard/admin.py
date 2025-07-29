@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.urls import path
 from django.db.models import Sum, Count
-from symptoms.models import Symptoms
+from disease_cases.models import DiseaseCase
 from burned.models import Burned
 import json
 
@@ -17,7 +17,7 @@ class DashboardAdmin(admin.AdminSite):
         return custom_urls + urls
 
     def dashboard_view(self, request):
-        health_data = Symptoms.objects.values('month_year').annotate(total=Count('id'))
+        health_data = DiseaseCase.objects.values('month_year').annotate(total=Count('id'))
         burned_data = Burned.objects.values('register_at__year', 'register_at__month').annotate(total=Count('id'))
         
         health_labels = [f"{item['month_year'].year}-{item['month_year'].month}" for item in health_data]

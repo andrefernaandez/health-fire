@@ -49,7 +49,7 @@ def process_health_file(file_path):
                 mes = col.split("/")[1]  
                 mes_num = MESES.index(mes) + 1  
                 
-                federative_unit = str(row[unidade_federacao_col]).replace(";", "").strip()
+                federative_unit_name = str(row[unidade_federacao_col]).replace(";", "").strip()
                 value = str(row[col]).replace(";", "").strip()
                 
                 try:
@@ -58,7 +58,7 @@ def process_health_file(file_path):
                     raise ValueError(f"Erro ao criar a data para {ano}-{mes_num}-01.")
                 
                 data_dicts.append({
-                    "unidade_federacao": federative_unit,
+                    "unidade_federacao": federative_unit_name,
                     "data": date_obj,
                     "valor": value  
                 })
@@ -85,14 +85,14 @@ def process_health_file(file_path):
 
 def process_burned_file(file_path):
     try:
-        # Leitura do arquivo CSV, ignorando as colunas "Pais" e "Estado"
+        # Leitura do arquivo CSV, incluindo a coluna "Estado"
         data = pd.read_csv(file_path, encoding='utf-8', delimiter=';', usecols=[
-            "DataHora", "Satelite", "Municipio", "Bioma", "DiaSemChuva",
+            "DataHora", "Satelite", "Municipio", "Estado", "Bioma", "DiaSemChuva",
             "Precipitacao", "RiscoFogo", "Latitude", "Longitude", "FRP"
         ])
 
         # Verifica quantos valores NaN existem nas colunas Municipio e Bioma
-        print(data[['Municipio', 'Bioma']].isna().sum())
+        print(data[['Municipio', 'Estado', 'Bioma']].isna().sum())
 
         correcoes = {
             "√É": "Ã", "√â": "É", "√Å": "Á", "√¥": "Ô", "√ì": "Ó",
@@ -101,7 +101,7 @@ def process_burned_file(file_path):
         }
 
         # Lista de colunas a serem corrigidas (apenas as utilizadas)
-        colunas = ["Municipio", "Bioma"]
+        colunas = ["Municipio", "Bioma", "Estado"]
 
         # Aplica as correções
         for coluna in colunas:
@@ -117,6 +117,7 @@ def process_burned_file(file_path):
                 "register_at": row["DataHora"],
                 "satellite": row["Satelite"],
                 "city": row["Municipio"],
+                "federative_unit": row["Estado"],
                 "biome": row["Bioma"],
                 "no_rain_days": row["DiaSemChuva"],
                 "precipitation": row["Precipitacao"],

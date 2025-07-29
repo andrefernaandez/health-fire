@@ -3,10 +3,10 @@ from django.db import models
 
 class ImportFile(models.Model):
     TYPE_HEALTH="health"
-    TYPE_FIRE="fire"
+    TYPE_BURNED="burned"
     FILE_TYPE_CHOICES = [
         (TYPE_HEALTH, 'Saúde'),
-        (TYPE_FIRE, 'Queimadas'),
+        (TYPE_BURNED, 'Queimadas'),
     ]
     STATUS_OPEN = 1
     STATUS_PROGRESS = 2
