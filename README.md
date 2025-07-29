@@ -32,7 +32,7 @@ O objetivo é oferecer insights por meio de análises e visualizações interati
 
 ## Dashboard Online
 
-Acesse o dashboard interativo publicado no Power BI Service [indisponível).
+Acesse o dashboard interativo publicado no Power BI Service (https://app.powerbi.com/view?r=eyJrIjoiZmM0MzZmODMtNDE4My00YjFhLThiZDgtZmIwMWM2NzNhMmEwIiwidCI6ImY5MTQ5YTgzLTM5MjAtNDFiZS04YjU2LTdjYWQyMzY4MGE2YSJ9).
 
 ## Tecnologias Utilizadas
 - PostgreSQL + pgAdmin
