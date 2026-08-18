@@ -4,9 +4,11 @@ from django.db import models
 class ImportFile(models.Model):
     TYPE_HEALTH="health"
     TYPE_BURNED="burned"
+    TYPE_SIVEP_SRAG="sivep_srag"
     FILE_TYPE_CHOICES = [
         (TYPE_HEALTH, 'Saúde'),
         (TYPE_BURNED, 'Queimadas'),
+        (TYPE_SIVEP_SRAG, 'Sivep-Srag'),
     ]
     STATUS_OPEN = 1
     STATUS_PROGRESS = 2

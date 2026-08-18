@@ -1,23 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <transformation>
   <info>
     <name>dim_tempo</name>
-    <description/>
-    <extended_description/>
-    <trans_version/>
+    <description />
+    <extended_description />
+    <trans_version />
     <trans_type>Normal</trans_type>
     <trans_status>0</trans_status>
     <directory>/</directory>
-    <parameters>
-    </parameters>
+    <parameters></parameters>
     <log>
       <trans-log-table>
-        <connection/>
-        <schema/>
-        <table/>
-        <size_limit_lines/>
-        <interval/>
-        <timeout_days/>
+        <connection />
+        <schema />
+        <table />
+        <size_limit_lines />
+        <interval />
+        <timeout_days />
         <field>
           <id>ID_BATCH</id>
           <enabled>Y</enabled>
@@ -42,37 +41,37 @@
           <id>LINES_READ</id>
           <enabled>Y</enabled>
           <name>LINES_READ</name>
-          <subject/>
+          <subject />
         </field>
         <field>
           <id>LINES_WRITTEN</id>
           <enabled>Y</enabled>
           <name>LINES_WRITTEN</name>
-          <subject/>
+          <subject />
         </field>
         <field>
           <id>LINES_UPDATED</id>
           <enabled>Y</enabled>
           <name>LINES_UPDATED</name>
-          <subject/>
+          <subject />
         </field>
         <field>
           <id>LINES_INPUT</id>
           <enabled>Y</enabled>
           <name>LINES_INPUT</name>
-          <subject/>
+          <subject />
         </field>
         <field>
           <id>LINES_OUTPUT</id>
           <enabled>Y</enabled>
           <name>LINES_OUTPUT</name>
-          <subject/>
+          <subject />
         </field>
         <field>
           <id>LINES_REJECTED</id>
           <enabled>Y</enabled>
           <name>LINES_REJECTED</name>
-          <subject/>
+          <subject />
         </field>
         <field>
           <id>ERRORS</id>
@@ -126,11 +125,11 @@
         </field>
       </trans-log-table>
       <perf-log-table>
-        <connection/>
-        <schema/>
-        <table/>
-        <interval/>
-        <timeout_days/>
+        <connection />
+        <schema />
+        <table />
+        <interval />
+        <timeout_days />
         <field>
           <id>ID_BATCH</id>
           <enabled>Y</enabled>
@@ -208,10 +207,10 @@
         </field>
       </perf-log-table>
       <channel-log-table>
-        <connection/>
-        <schema/>
-        <table/>
-        <timeout_days/>
+        <connection />
+        <schema />
+        <table />
+        <timeout_days />
         <field>
           <id>ID_BATCH</id>
           <enabled>Y</enabled>
@@ -274,10 +273,10 @@
         </field>
       </channel-log-table>
       <step-log-table>
-        <connection/>
-        <schema/>
-        <table/>
-        <timeout_days/>
+        <connection />
+        <schema />
+        <table />
+        <timeout_days />
         <field>
           <id>ID_BATCH</id>
           <enabled>Y</enabled>
@@ -350,10 +349,10 @@
         </field>
       </step-log-table>
       <metrics-log-table>
-        <connection/>
-        <schema/>
-        <table/>
-        <timeout_days/>
+        <connection />
+        <schema />
+        <table />
+        <timeout_days />
         <field>
           <id>ID_BATCH</id>
           <enabled>Y</enabled>
@@ -402,9 +401,9 @@
       </metrics-log-table>
     </log>
     <maxdate>
-      <connection/>
-      <table/>
-      <field/>
+      <connection />
+      <table />
+      <field />
       <offset>0.0</offset>
       <maxdiff>0.0</maxdiff>
     </maxdate>
@@ -415,18 +414,14 @@
     <feedback_shown>Y</feedback_shown>
     <feedback_size>50000</feedback_size>
     <using_thread_priorities>Y</using_thread_priorities>
-    <shared_objects_file/>
+    <shared_objects_file />
     <capture_step_performance>N</capture_step_performance>
     <step_performance_capturing_delay>1000</step_performance_capturing_delay>
     <step_performance_capturing_size_limit>100</step_performance_capturing_size_limit>
-    <dependencies>
-    </dependencies>
-    <partitionschemas>
-    </partitionschemas>
-    <slaveservers>
-    </slaveservers>
-    <clusterschemas>
-    </clusterschemas>
+    <dependencies></dependencies>
+    <partitionschemas></partitionschemas>
+    <slaveservers></slaveservers>
+    <clusterschemas></clusterschemas>
     <created_user>-</created_user>
     <created_date>2025/07/12 10:27:07.554</created_date>
     <modified_user>-</modified_user>
@@ -434,8 +429,7 @@
     <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
-  <notepads>
-  </notepads>
+  <notepads></notepads>
   <connection>
     <name>postgres_healthfire</name>
     <server>localhost</server>
@@ -445,9 +439,9 @@
     <port>5432</port>
     <username>postgres</username>
     <password>Encrypted 2be98afc86aa7f2e4cb79fc2686c7fb8a</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
+    <servername />
+    <data_tablespace />
+    <index_tablespace />
     <attributes>
       <attribute>
         <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
@@ -489,7 +483,7 @@
   </connection>
   <order>
     <hop>
-      <from>Selecionar mês, trimestre, semestre e ano</from>
+      <from>Selecionar tempo com nome do mês</from>
       <to>Gravar na dim_tempo</to>
       <enabled>Y</enabled>
     </hop>
@@ -497,13 +491,13 @@
   <step>
     <name>Gravar na dim_tempo</name>
     <type>TableOutput</type>
-    <description/>
+    <description />
     <distribute>Y</distribute>
-    <custom_distribution/>
+    <custom_distribution />
     <copies>1</copies>
     <partitioning>
       <method>none</method>
-      <schema_name/>
+      <schema_name />
     </partitioning>
     <connection>postgres_healthfire</connection>
     <schema>public</schema>
@@ -512,21 +506,17 @@
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
     <use_batch>N</use_batch>
-    <specify_fields>N</specify_fields>
+    <specify_fields>Y</specify_fields>
     <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
+    <partitioning_field />
     <partitioning_daily>N</partitioning_daily>
     <partitioning_monthly>Y</partitioning_monthly>
     <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
+    <tablename_field />
     <tablename_in_table>Y</tablename_in_table>
     <return_keys>N</return_keys>
-    <return_field/>
+    <return_field />
     <fields>
-      <field>
-        <column_name>ano</column_name>
-        <stream_name>ano</stream_name>
-      </field>
       <field>
         <column_name>mes</column_name>
         <stream_name>mes</stream_name>
@@ -539,14 +529,20 @@
         <column_name>semestre</column_name>
         <stream_name>semestre</stream_name>
       </field>
+      <field>
+        <column_name>ano</column_name>
+        <stream_name>ano</stream_name>
+      </field>
+      <field>
+        <column_name>nome_mes</column_name>
+        <stream_name>nome_mes</stream_name>
+      </field>
     </fields>
-    <attributes/>
-    <cluster_schema/>
+    <attributes />
+    <cluster_schema />
     <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
+      <input></input>
+      <output></output>
     </remotesteps>
     <GUI>
       <xloc>400</xloc>
@@ -555,34 +551,63 @@
     </GUI>
   </step>
   <step>
-    <name>Selecionar mês, trimestre, semestre e ano</name>
+    <name>Selecionar tempo com nome do mês</name>
     <type>TableInput</type>
-    <description/>
+    <description />
     <distribute>Y</distribute>
-    <custom_distribution/>
+    <custom_distribution />
     <copies>1</copies>
     <partitioning>
       <method>none</method>
-      <schema_name/>
+      <schema_name />
     </partitioning>
     <connection>postgres_healthfire</connection>
-    <sql>SELECT DISTINCT
-  EXTRACT(YEAR FROM register_at)::int AS ano,
-  EXTRACT(MONTH FROM register_at)::int AS mes,
-  ((EXTRACT(MONTH FROM register_at)::int - 1) / 3 + 1)::int AS trimestre,
-  CASE 
-    WHEN EXTRACT(MONTH FROM register_at)::int BETWEEN 1 AND 6 THEN 1 
-    ELSE 2 
-  END AS semestre
-FROM (
-  SELECT register_at FROM burned_burned
-  UNION
-  SELECT register_at FROM disease_cases_diseasecase
-) AS combined
+    <sql>WITH datas_origem AS (
+    SELECT register_at::date AS data_ref
+    FROM burned_burned
+    WHERE register_at IS NOT NULL
+
+    UNION
+
+    SELECT register_at::date AS data_ref
+    FROM disease_cases_diseasecase
+    WHERE register_at IS NOT NULL
+
+    UNION
+
+    SELECT dt_interna::date AS data_ref
+    FROM sivep_srag
+    WHERE dt_interna IS NOT NULL
+)
+SELECT DISTINCT
+    EXTRACT(MONTH FROM data_ref)::int AS mes,
+    ((EXTRACT(MONTH FROM data_ref)::int - 1) / 3 + 1)::int AS trimestre,
+    CASE
+        WHEN EXTRACT(MONTH FROM data_ref)::int BETWEEN 1 AND 6 THEN 1
+        ELSE 2
+    END AS semestre,
+    EXTRACT(YEAR FROM data_ref)::int AS ano,
+    CASE EXTRACT(MONTH FROM data_ref)::int
+        WHEN 1 THEN 'Janeiro'
+        WHEN 2 THEN 'Fevereiro'
+        WHEN 3 THEN 'Março'
+        WHEN 4 THEN 'Abril'
+        WHEN 5 THEN 'Maio'
+        WHEN 6 THEN 'Junho'
+        WHEN 7 THEN 'Julho'
+        WHEN 8 THEN 'Agosto'
+        WHEN 9 THEN 'Setembro'
+        WHEN 10 THEN 'Outubro'
+        WHEN 11 THEN 'Novembro'
+        WHEN 12 THEN 'Dezembro'
+    END AS nome_mes
+FROM datas_origem
+WHERE data_ref &gt;= DATE '2015-01-01'
+  AND data_ref &lt; DATE '2026-01-01'
 ORDER BY ano, mes;
 </sql>
     <limit>0</limit>
-    <lookup/>
+    <lookup />
     <execute_each_row>N</execute_each_row>
     <variables_active>N</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
@@ -599,7 +624,7 @@ ORDER BY ano, mes;
         <conversion_Mask>####0;-####0</conversion_Mask>
         <decimal_symbol>,</decimal_symbol>
         <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
+        <currency_symbol />
         <trim_type>none</trim_type>
         <case_insensitive>N</case_insensitive>
         <collator_disabled>Y</collator_disabled>
@@ -622,7 +647,7 @@ ORDER BY ano, mes;
         <conversion_Mask>####0;-####0</conversion_Mask>
         <decimal_symbol>,</decimal_symbol>
         <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
+        <currency_symbol />
         <trim_type>none</trim_type>
         <case_insensitive>N</case_insensitive>
         <collator_disabled>Y</collator_disabled>
@@ -645,7 +670,7 @@ ORDER BY ano, mes;
         <conversion_Mask>####0;-####0</conversion_Mask>
         <decimal_symbol>,</decimal_symbol>
         <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
+        <currency_symbol />
         <trim_type>none</trim_type>
         <case_insensitive>N</case_insensitive>
         <collator_disabled>Y</collator_disabled>
@@ -668,7 +693,7 @@ ORDER BY ano, mes;
         <conversion_Mask>####0;-####0</conversion_Mask>
         <decimal_symbol>,</decimal_symbol>
         <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
+        <currency_symbol />
         <trim_type>none</trim_type>
         <case_insensitive>N</case_insensitive>
         <collator_disabled>Y</collator_disabled>
@@ -681,13 +706,11 @@ ORDER BY ano, mes;
         <lenient_string_to_number>N</lenient_string_to_number>
       </value-meta>
     </row-meta>
-    <attributes/>
-    <cluster_schema/>
+    <attributes />
+    <cluster_schema />
     <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
+      <input></input>
+      <output></output>
     </remotesteps>
     <GUI>
       <xloc>176</xloc>
@@ -695,10 +718,8 @@ ORDER BY ano, mes;
       <draw>Y</draw>
     </GUI>
   </step>
-  <step_error_handling>
-  </step_error_handling>
-  <slave-step-copy-partition-distribution>
-  </slave-step-copy-partition-distribution>
+  <step_error_handling></step_error_handling>
+  <slave-step-copy-partition-distribution></slave-step-copy-partition-distribution>
   <slave_transformation>N</slave_transformation>
-  <attributes/>
+  <attributes />
 </transformation>

@@ -572,7 +572,7 @@ ORDER BY nome_bioma;
         <name>nome_bioma</name>
         <length>50</length>
         <precision>-1</precision>
-        <origin>Table input</origin>
+        <origin>Selecionar bioma</origin>
         <comments>nome_bioma</comments>
         <conversion_Mask/>
         <decimal_symbol>,</decimal_symbol>
