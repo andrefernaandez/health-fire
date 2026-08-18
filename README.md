@@ -59,6 +59,8 @@ O painel desenvolvido permite investigar os dados por ano, mês, região, unidad
 - Óbitos e taxa de mortalidade.
 - Casos e óbitos por SRAG/COVID-19 e SRAG não COVID-19.
 - Correlação entre focos de queimadas e internações respiratórias.
+Acesse o dashboard interativo publicado no Power BI Service (https://app.powerbi.com/view?r=eyJrIjoiZmM0MzZmODMtNDE4My00YjFhLThiZDgtZmIwMWM2NzNhMmEwIiwidCI6ImY5MTQ5YTgzLTM5MjAtNDFiZS04YjU2LTdjYWQyMzY4MGE2YSJ9).
+
 
 ## Tecnologias Utilizadas
 
