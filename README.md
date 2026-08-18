@@ -43,6 +43,7 @@ O painel desenvolvido permite investigar os dados por ano, mês, região, unidad
 - Visualizações por período, região, estado, bioma e CID.
 - Comparações entre DATASUS, SIVEP-Gripe e queimadas.
 - Apoio à validação dos resultados com fontes oficiais.
+- [Acessar dashboard](https://app.powerbi.com/view?r=eyJrIjoiZDk0MGE2NzMtOTAzYi00YmI5LTlkODAtNjQyZGYxM2NhZDQ4IiwidCI6ImY5MTQ5YTgzLTM5MjAtNDFiZS04YjU2LTdjYWQyMzY4MGE2YSJ9)
 
 ### Análises Complementares
 
@@ -82,7 +83,6 @@ O painel desenvolvido permite investigar os dados por ano, mês, região, unidad
 ## Observações
 
 As bases públicas utilizadas no projeto podem ser obtidas nas fontes oficiais indicadas no trabalho acadêmico. Arquivos brutos de grande volume não são versionados diretamente neste repositório.
-
 
 ## Autor
 
