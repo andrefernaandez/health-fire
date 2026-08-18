@@ -1,4 +1,4 @@
-# Health-Fire: Queimadas e Saúde Respiratória no Brasil (2015-2025)
+# Health-Fire: Integração e Análise de Dados sobre Queimadas e Saúde Respiratória no Brasil (2015-2025)
 
 ## Descrição
 
