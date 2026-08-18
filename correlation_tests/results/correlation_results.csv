@@ -1,0 +1,3 @@
+method,coefficient,sample_size,start_year,end_year,lag_months
+pearson,-0.03308649733176665,3440,2015,2025,0
+spearman,0.16347503352828094,3440,2015,2025,0

@@ -1,7 +1,7 @@
 from celery import shared_task
-from importer.utils import process_health_file, process_burned_file
+from importer.utils import process_health_file, process_burned_file, process_sivep_srag_file
 from health.models import TypeContent, CID
-from disease_cases.models import DiseaseCase
+from disease_cases.models import DiseaseCase, SivepSrag
 from importer.models import ImportFile
 from burned.models import Burned
 from geo_data.models import Biome, City, Satellite, FederativeUnit
@@ -44,14 +44,14 @@ def process_file_health(import_file_id):
                     continue  # Ignorar linha se o valor estiver ausente
 
                 # Criar instância de disease_cases no banco
-                disease=DiseaseCase.objects.filter(
-                    type_health=type_health,
-                    cid=cid,
-                    federative_unit_name=federative_unit_name,
-                    month_year__month=line["data"].month,
-                      month_year__year=line["data"].year,  # Usando a data completa
-                    value=line["valor"],
+                disease = DiseaseCase.objects.filter(
+                type_health=type_health,
+                cid=cid,
+                federative_unit_name=federative_unit_name,
+                register_at=line["data"],  # data completa
+                value=line["valor"],
                 ).first()
+
                 if not disease:
                     DiseaseCase.objects.create(
                     type_health=type_health,
@@ -80,9 +80,6 @@ def process_file_health(import_file_id):
             import_file.status = ImportFile.STATUS_OPEN
             import_file.save()
         raise Exception(f"Erro ao processar o arquivo: {e}")
-
-
-
 
 
 
@@ -182,3 +179,73 @@ def process_file_burned(import_file_id):
     
     logger.info(f"Processamento do ImportFile ID {import_file_id} concluído.")
     return f"Arquivo {import_file.file.name} processado com sucesso!"
+
+
+
+
+
+
+@shared_task
+def process_file_sivep_srag(import_file_id):
+    logger.info(f"Iniciando SIVEP SRAG ID: {import_file_id}")
+
+    import_file = ImportFile.objects.get(id=import_file_id)
+
+    import_file.status = ImportFile.STATUS_PROGRESS
+    import_file.start_at = timezone.now()
+    import_file.save()
+
+    try:
+        processed_data = process_sivep_srag_file(import_file.file.path)
+        data_list = processed_data["data"]
+
+        logger.info(f"TOTAL LIDO CSV: {len(data_list)}")
+
+        BATCH_SIZE = 5000
+        batch = []
+        total_inserted = 0
+
+        for i, line in enumerate(data_list):
+
+            nu = line.get("nu_notific")
+
+            if nu is None:
+                continue
+
+            batch.append(
+                SivepSrag(
+                    nu_notific=str(nu),
+                    dt_interna=line.get("dt_interna"),
+                    sg_uf=line.get("sg_uf"),
+                    co_mun_res=line.get("co_mun_res"),
+                    classi_fin=line.get("classi_fin"),
+                    evolucao=line.get("evolucao"),
+                    cs_sexo=line.get("cs_sexo"),
+                    nu_idade_n=line.get("nu_idade_n"),
+                    file=import_file,
+                )
+            )
+
+            # 🔥 INSERE EM LOTES
+            if len(batch) >= BATCH_SIZE:
+                SivepSrag.objects.bulk_create(batch, batch_size=BATCH_SIZE)
+                total_inserted += len(batch)
+                batch = []
+
+        # INSERE RESTANTE
+        if batch:
+            SivepSrag.objects.bulk_create(batch, batch_size=BATCH_SIZE)
+            total_inserted += len(batch)
+
+        logger.info(f"INSERIDOS NO BANCO: {total_inserted}")
+
+        import_file.status = ImportFile.STATUS_FINALLY
+        import_file.end_at = timezone.now()
+        import_file.save()
+
+        return f"Inseridos: {total_inserted}"
+
+    except Exception as e:
+        import_file.status = ImportFile.STATUS_OPEN
+        import_file.save()
+        raise Exception(f"Erro ao processar SIVEP SRAG: {e}")
