@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <transformation>
   <info>
-    <name>fato_queimadas_saude</name>
+    <name>fato_datasus_cid</name>
     <description />
     <extended_description />
     <trans_version />
@@ -482,13 +482,13 @@
   </connection>
   <order>
     <hop>
-      <from>Dados do DataSUS, SIVEP e Queimadas</from>
-      <to>Gravar na fato_queimadas_saude</to>
+      <from>Selecionar internações por CID</from>
+      <to>Gravar na fato_datasus_cid</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>Dados do DataSUS, SIVEP e Queimadas</name>
+    <name>Selecionar internações por CID</name>
     <type>TableInput</type>
     <description />
     <distribute>Y</distribute>
@@ -499,189 +499,50 @@
       <schema_name />
     </partitioning>
     <connection>postgres_healthfire</connection>
-    <sql>WITH datasus AS (
-    SELECT
-        dt.id AS id_dim_tempo,
-        dl.id AS id_dim_localidade,
-
-        SUM(CASE
-            WHEN th.name = 'Internações por Unidade da Federação e Ano/mês atendimento'
-             AND dc.cid_id = 38
-            THEN dc.value ELSE 0
-        END) AS internacoes_geral,
-
-        SUM(CASE
-            WHEN th.name = 'Internações por Unidade da Federação e Ano/mês atendimento'
-             AND cid.name ILIKE '%asma%'
-            THEN dc.value ELSE 0
-        END) AS internacoes_asma,
-
-        SUM(CASE
-            WHEN th.name = 'Internações por Unidade da Federação e Ano/mês atendimento'
-             AND cid.name ILIKE '%bronquite%'
-            THEN dc.value ELSE 0
-        END) AS internacoes_bronquite,
-
-        SUM(CASE
-            WHEN th.name = 'Internações por Unidade da Federação e Ano/mês atendimento'
-             AND cid.name ILIKE '%pneumonia%'
-            THEN dc.value ELSE 0
-        END) AS internacoes_pneumonia,
-
-        SUM(CASE
-            WHEN th.name = 'Internações por Unidade da Federação e Ano/mês atendimento'
-             AND cid.name ILIKE '%pancreatite%'
-            THEN dc.value ELSE 0
-        END) AS internacoes_pancreatite,
-
-        SUM(CASE
-            WHEN th.name = 'Internações por Unidade da Federação e Ano/mês atendimento'
-             AND cid.name ILIKE '%artrose%'
-            THEN dc.value ELSE 0
-        END) AS internacoes_artrose,
-
-        SUM(CASE
-            WHEN th.name = 'Óbitos por Unidade da Federação e Ano/mês atendimento'
-            THEN dc.value ELSE 0
-        END) AS total_obitos,
-
-        MAX(CASE
-            WHEN th.name = 'Taxa Mortalidade por Unidade da Federação e Ano/mês atendimento'
-            THEN dc.value ELSE 0
-        END) AS taxa_mortalidade
-
-    FROM disease_cases_diseasecase dc
-    JOIN health_typecontent th
-        ON dc.type_health_id = th.id
-    LEFT JOIN health_cid cid
-        ON dc.cid_id = cid.id
-    JOIN dim_tempo dt
-        ON EXTRACT(YEAR FROM dc.register_at) = dt.ano
-       AND EXTRACT(MONTH FROM dc.register_at) = dt.mes
-    JOIN dim_localidade dl
-        ON LOWER(TRIM(dc.federative_unit_name)) = LOWER(TRIM(dl.estado))
-    WHERE th.name IN (
-        'Internações por Unidade da Federação e Ano/mês atendimento',
-        'Óbitos por Unidade da Federação e Ano/mês atendimento',
-        'Taxa Mortalidade por Unidade da Federação e Ano/mês atendimento'
-    )
-    GROUP BY
-        dt.id,
-        dl.id
-),
-
-queimadas AS (
-    SELECT
-        dt.id AS id_dim_tempo,
-        dl.id AS id_dim_localidade,
-        MIN(db.id) AS id_dim_bioma,
-        COUNT(b.id) AS total_queimadas,
-        FLOOR(GREATEST(0, AVG(NULLIF(b.no_rain_days, -999))))::int AS dias_sem_chuva,
-        ROUND(AVG(NULLIF(b.precipitation, -999))::numeric, 2) AS precipitacao,
-        ROUND(AVG(NULLIF(CASE WHEN b.fire_risk &gt; 0 THEN b.fire_risk END, -999))::numeric, 2) AS risco_fogo
-    FROM burned_burned b
-    LEFT JOIN geo_data_federativeunit fu
-        ON fu.id = b.federative_unit_id
-    LEFT JOIN geo_data_biome bio
-        ON bio.id = b.biome_id
-    LEFT JOIN dim_bioma db
-        ON LOWER(TRIM(bio.name)) = LOWER(TRIM(db.nome_bioma))
-    JOIN dim_tempo dt
-        ON EXTRACT(YEAR FROM b.register_at) = dt.ano
-       AND EXTRACT(MONTH FROM b.register_at) = dt.mes
-    JOIN dim_localidade dl
-        ON LOWER(TRIM(fu.name)) = LOWER(TRIM(dl.estado))
-    GROUP BY
-        dt.id,
-        dl.id
-),
-
-sivep AS (
-    SELECT
-        dt.id AS id_dim_tempo,
-        dl.id AS id_dim_localidade,
-        COUNT(CASE WHEN s.classi_fin = 5 THEN 1 END) AS casos_sivep_covid,
-        COUNT(CASE WHEN s.classi_fin &lt;&gt; 5 OR s.classi_fin IS NULL THEN 1 END) AS casos_sivep_nao_covid,
-        COUNT(CASE WHEN s.classi_fin = 5 AND s.evolucao = 2 THEN 1 END) AS obitos_sivep_covid,
-        COUNT(CASE WHEN (s.classi_fin &lt;&gt; 5 OR s.classi_fin IS NULL) AND s.evolucao = 2 THEN 1 END) AS obitos_sivep_nao_covid
-    FROM sivep_srag s
-    JOIN dim_tempo dt
-        ON EXTRACT(YEAR FROM s.dt_interna) = dt.ano
-       AND EXTRACT(MONTH FROM s.dt_interna) = dt.mes
-    JOIN dim_localidade dl
-        ON dl.estado = (
-            CASE
-                WHEN s.sg_uf = 'AC' THEN 'Acre'
-                WHEN s.sg_uf = 'AL' THEN 'Alagoas'
-                WHEN s.sg_uf = 'AP' THEN 'Amapá'
-                WHEN s.sg_uf = 'AM' THEN 'Amazonas'
-                WHEN s.sg_uf = 'BA' THEN 'Bahia'
-                WHEN s.sg_uf = 'CE' THEN 'Ceará'
-                WHEN s.sg_uf = 'DF' THEN 'Distrito Federal'
-                WHEN s.sg_uf = 'ES' THEN 'Espírito Santo'
-                WHEN s.sg_uf = 'GO' THEN 'Goiás'
-                WHEN s.sg_uf = 'MA' THEN 'Maranhão'
-                WHEN s.sg_uf = 'MT' THEN 'Mato Grosso'
-                WHEN s.sg_uf = 'MS' THEN 'Mato Grosso Do Sul'
-                WHEN s.sg_uf = 'MG' THEN 'Minas Gerais'
-                WHEN s.sg_uf = 'PA' THEN 'Pará'
-                WHEN s.sg_uf = 'PB' THEN 'Paraíba'
-                WHEN s.sg_uf = 'PR' THEN 'Paraná'
-                WHEN s.sg_uf = 'PE' THEN 'Pernambuco'
-                WHEN s.sg_uf = 'PI' THEN 'Piauí'
-                WHEN s.sg_uf = 'RJ' THEN 'Rio De Janeiro'
-                WHEN s.sg_uf = 'RN' THEN 'Rio Grande Do Norte'
-                WHEN s.sg_uf = 'RS' THEN 'Rio Grande Do Sul'
-                WHEN s.sg_uf = 'RO' THEN 'Rondônia'
-                WHEN s.sg_uf = 'RR' THEN 'Roraima'
-                WHEN s.sg_uf = 'SC' THEN 'Santa Catarina'
-                WHEN s.sg_uf = 'SP' THEN 'São Paulo'
-                WHEN s.sg_uf = 'SE' THEN 'Sergipe'
-                WHEN s.sg_uf = 'TO' THEN 'Tocantins'
-            END
-        )
-    WHERE s.dt_interna IS NOT NULL
-    GROUP BY
-        dt.id,
-        dl.id
-)
-
-SELECT
-    d.id_dim_tempo,
-    d.id_dim_localidade,
-    q.id_dim_bioma AS id_dim_bioma,
-    38 AS id_dim_cid,
-
-    COALESCE(d.internacoes_geral, 0) AS internacoes_geral,
-    COALESCE(d.internacoes_asma, 0) AS internacoes_asma,
-    COALESCE(d.internacoes_bronquite, 0) AS internacoes_bronquite,
-    COALESCE(d.internacoes_pneumonia, 0) AS internacoes_pneumonia,
-    COALESCE(d.internacoes_pancreatite, 0) AS internacoes_pancreatite,
-    COALESCE(d.internacoes_artrose, 0) AS internacoes_artrose,
-    COALESCE(d.total_obitos, 0) AS total_obitos,
-    COALESCE(d.taxa_mortalidade, 0) AS taxa_mortalidade,
-
-    COALESCE(q.total_queimadas, 0) AS total_queimadas,
-    COALESCE(q.dias_sem_chuva, 0) AS dias_sem_chuva,
-    COALESCE(q.precipitacao, 0) AS precipitacao,
-    COALESCE(q.risco_fogo, 0) AS risco_fogo,
-
-    COALESCE(s.casos_sivep_covid, 0) AS casos_sivep_covid,
-    COALESCE(s.casos_sivep_nao_covid, 0) AS casos_sivep_nao_covid,
-    COALESCE(s.obitos_sivep_covid, 0) AS obitos_sivep_covid,
-    COALESCE(s.obitos_sivep_nao_covid, 0) AS obitos_sivep_nao_covid
-
-FROM datasus d
-LEFT JOIN queimadas q
-    ON q.id_dim_tempo = d.id_dim_tempo
-   AND q.id_dim_localidade = d.id_dim_localidade
-LEFT JOIN sivep s
-    ON s.id_dim_tempo = d.id_dim_tempo
-   AND s.id_dim_localidade = d.id_dim_localidade
-ORDER BY
-    d.id_dim_tempo,
-    d.id_dim_localidade;
-
+    <sql>SELECT
+    dt.id AS id_dim_tempo,
+    dl.id AS id_dim_localidade,
+    dci.id AS id_dim_cid,
+    dc.type_health_id::int AS id_tipo_conteudo,
+    EXTRACT(YEAR FROM dc.register_at)::int AS ano,
+    EXTRACT(MONTH FROM dc.register_at)::int AS mes,
+    dl.estado AS estado,
+    dci.name AS nome_cid,
+    SUM(dc.value)::int AS internacoes
+FROM disease_cases_diseasecase dc
+JOIN health_cid cid
+    ON dc.cid_id = cid.id
+JOIN dim_cid dci
+    ON dci.id = cid.id
+JOIN dim_tempo dt
+    ON dt.ano = EXTRACT(YEAR FROM dc.register_at)::int
+   AND dt.mes = EXTRACT(MONTH FROM dc.register_at)::int
+JOIN dim_localidade dl
+    ON LOWER(TRIM(dl.estado)) = LOWER(TRIM(
+        CASE LOWER(TRIM(dc.federative_unit_name))
+            WHEN 'mato grosso do sul' THEN 'Mato Grosso do Sul'
+            WHEN 'rio de janeiro' THEN 'Rio de Janeiro'
+            WHEN 'rio grande do norte' THEN 'Rio Grande do Norte'
+            WHEN 'rio grande do sul' THEN 'Rio Grande do Sul'
+            ELSE dc.federative_unit_name
+        END
+    ))
+WHERE dc.type_health_id = 43
+  AND dc.register_at &gt;= TIMESTAMP '2015-01-01'
+  AND dc.register_at &lt; TIMESTAMP '2026-01-01'
+  AND dc.federative_unit_name IS NOT NULL
+  AND LOWER(TRIM(dc.federative_unit_name)) &lt;&gt; 'total'
+  AND dc.cid_id IN (38, 63, 64, 65, 67, 68)
+GROUP BY
+    dt.id,
+    dl.id,
+    dci.id,
+    dc.type_health_id,
+    EXTRACT(YEAR FROM dc.register_at)::int,
+    EXTRACT(MONTH FROM dc.register_at)::int,
+    dl.estado,
+    dci.name
+ORDER BY ano, mes, estado, nome_cid;
 </sql>
     <limit>0</limit>
     <lookup />
@@ -1164,7 +1025,7 @@ ORDER BY
     </GUI>
   </step>
   <step>
-    <name>Gravar na fato_queimadas_saude</name>
+    <name>Gravar na fato_datasus_cid</name>
     <type>TableOutput</type>
     <description />
     <distribute>Y</distribute>
@@ -1176,7 +1037,7 @@ ORDER BY
     </partitioning>
     <connection>postgres_healthfire</connection>
     <schema />
-    <table>fato_queimadas_saude</table>
+    <table>fato_datasus_cid</table>
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
@@ -1201,76 +1062,32 @@ ORDER BY
         <stream_name>id_dim_localidade</stream_name>
       </field>
       <field>
-        <column_name>id_dim_bioma</column_name>
-        <stream_name>id_dim_bioma</stream_name>
-      </field>
-      <field>
         <column_name>id_dim_cid</column_name>
         <stream_name>id_dim_cid</stream_name>
       </field>
       <field>
-        <column_name>internacoes_geral</column_name>
-        <stream_name>internacoes_geral</stream_name>
+        <column_name>id_tipo_conteudo</column_name>
+        <stream_name>id_tipo_conteudo</stream_name>
       </field>
       <field>
-        <column_name>internacoes_asma</column_name>
-        <stream_name>internacoes_asma</stream_name>
+        <column_name>ano</column_name>
+        <stream_name>ano</stream_name>
       </field>
       <field>
-        <column_name>internacoes_bronquite</column_name>
-        <stream_name>internacoes_bronquite</stream_name>
+        <column_name>mes</column_name>
+        <stream_name>mes</stream_name>
       </field>
       <field>
-        <column_name>internacoes_pneumonia</column_name>
-        <stream_name>internacoes_pneumonia</stream_name>
+        <column_name>estado</column_name>
+        <stream_name>estado</stream_name>
       </field>
       <field>
-        <column_name>internacoes_pancreatite</column_name>
-        <stream_name>internacoes_pancreatite</stream_name>
+        <column_name>nome_cid</column_name>
+        <stream_name>nome_cid</stream_name>
       </field>
       <field>
-        <column_name>internacoes_artrose</column_name>
-        <stream_name>internacoes_artrose</stream_name>
-      </field>
-      <field>
-        <column_name>total_obitos</column_name>
-        <stream_name>total_obitos</stream_name>
-      </field>
-      <field>
-        <column_name>taxa_mortalidade</column_name>
-        <stream_name>taxa_mortalidade</stream_name>
-      </field>
-      <field>
-        <column_name>total_queimadas</column_name>
-        <stream_name>total_queimadas</stream_name>
-      </field>
-      <field>
-        <column_name>dias_sem_chuva</column_name>
-        <stream_name>dias_sem_chuva</stream_name>
-      </field>
-      <field>
-        <column_name>precipitacao</column_name>
-        <stream_name>precipitacao</stream_name>
-      </field>
-      <field>
-        <column_name>risco_fogo</column_name>
-        <stream_name>risco_fogo</stream_name>
-      </field>
-      <field>
-        <column_name>casos_sivep_covid</column_name>
-        <stream_name>casos_sivep_covid</stream_name>
-      </field>
-      <field>
-        <column_name>casos_sivep_nao_covid</column_name>
-        <stream_name>casos_sivep_nao_covid</stream_name>
-      </field>
-      <field>
-        <column_name>obitos_sivep_covid</column_name>
-        <stream_name>obitos_sivep_covid</stream_name>
-      </field>
-      <field>
-        <column_name>obitos_sivep_nao_covid</column_name>
-        <stream_name>obitos_sivep_nao_covid</stream_name>
+        <column_name>internacoes</column_name>
+        <stream_name>internacoes</stream_name>
       </field>
     </fields>
     <attributes />
